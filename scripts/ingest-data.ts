@@ -6,33 +6,34 @@ import { PDFLoader } from 'langchain/document_loaders';
 import { PINECONE_INDEX_NAME, PINECONE_NAME_SPACE } from '@/config/pinecone';
 
 /* Name of directory to retrieve files from. You can change this as required */
-const filePath = 'docs/MorseVsFrederick.pdf';
+// const filePath = 'docs/AndersHafreager-FlowOfDiluteGasesInComplexNanoporousMedia-MastersThesis2014.pdf';
+const filePath = 'docs/python-sdk.pdf';
 
 export const run = async () => {
-  try {
+  // try {
     /*load raw docs from the pdf file in the directory */
     const loader = new PDFLoader(filePath);
     // const loader = new PDFLoader(filePath);
     const rawDocs = await loader.load();
 
     console.log(rawDocs);
-
     /* Split text into chunks */
     const textSplitter = new RecursiveCharacterTextSplitter({
       chunkSize: 1000,
       chunkOverlap: 200,
     });
-
+    console.log("got splitter")
+    
     const docs = await textSplitter.splitDocuments(rawDocs);
     console.log('split docs', docs);
-
+    
     console.log('creating vector store...');
     /*create and store the embeddings in the vectorStore*/
     const embeddings = new OpenAIEmbeddings();
     const index = pinecone.Index(PINECONE_INDEX_NAME); //change to your own index name
 
     //embed the PDF documents
-
+    console.log('Yeah got it')
     /* Pinecone recommends a limit of 100 vectors per upsert request to avoid errors*/
     const chunkSize = 50;
     for (let i = 0; i < docs.length; i += chunkSize) {
@@ -46,10 +47,10 @@ export const run = async () => {
         PINECONE_NAME_SPACE,
       );
     }
-  } catch (error) {
-    console.log('error', error);
-    throw new Error('Failed to ingest your data');
-  }
+  // } catch (error) {
+  //   console.log('error', error);
+  //   throw new Error('Failed to ingest your data');
+  // }
 };
 
 (async () => {
